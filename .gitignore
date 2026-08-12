@@ -46,6 +46,16 @@ footage/
 書き出し/
 export/
 
+# autoedit の中間ファイル
+__pycache__/
+*.py[cod]
+.venv/
+analysis.json
+plan.json
+*.analysis.json
+*.plan.json
+*.srt
+
 # OS / エディタ
 .DS_Store
 Thumbs.db
