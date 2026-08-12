@@ -24,7 +24,8 @@ Vlog の企画から公開までを 1 か所で管理するためのリポジト
 ├── assets/                # ロゴ・BGM リストなどの共通素材メモ
 └── scripts/
     ├── new-episode.sh     # 新しいエピソードの雛形を作るスクリプト
-    └── auto-edit/         # 素材と台本から動画を自動編集するツール
+    ├── auto-edit/         # 素材と台本から動画を自動編集するツール
+    └── route-map/         # 行程からルート図のアニメーションを作るツール
 ```
 
 ## 使い方
@@ -74,6 +75,19 @@ BGM そのものは生成できないため、曲は自分で用意します。
 セットアップと詳しい使い方は [`scripts/auto-edit/README.md`](scripts/auto-edit/README.md) を参照してください。
 
 **手元の PC で実行する必要があります**（クラウド上のセッションには素材がないため）。
+
+## ルート図のアニメーション
+
+旅の行程を、地図の上に線が 1 本ずつ伸びていくアニメーションにできます。
+
+```bash
+cd scripts/route-map
+python -m routemap --size 4k -o ~/Desktop/EP002-routemap.mp4
+```
+
+行程は `scripts/route-map/routemap/itinerary.py` に書きます。
+**遅延などで行程が変わったら、そのファイルを直して実行し直すだけ**です。
+詳しくは [`scripts/route-map/README.md`](scripts/route-map/README.md) を参照してください。
 
 ## 動画ファイルの扱い
 

@@ -1,0 +1,5 @@
+# 画像の描画
+Pillow>=10.0.0
+
+# ffmpeg が PATH にない場合の保険。自分で入れているなら不要
+imageio-ffmpeg>=0.4.9
