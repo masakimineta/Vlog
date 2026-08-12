@@ -1,0 +1,56 @@
+# 動画ファイル
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.mts
+*.m2ts
+*.wmv
+*.flv
+*.webm
+
+# 音声ファイル
+*.wav
+*.aif
+*.aiff
+*.mp3
+*.m4a
+*.flac
+
+# 画像・RAW
+*.raw
+*.arw
+*.cr2
+*.cr3
+*.nef
+*.dng
+*.psd
+*.tif
+*.tiff
+
+# 編集ソフトのプロジェクト・キャッシュ
+*.prproj
+*.aep
+*.fcpbundle
+*.drp
+*.veg
+Adobe Premiere Pro Auto-Save/
+Adobe Premiere Pro Preview Files/
+Adobe After Effects Auto-Save/
+*.pek
+*.cfa
+
+# 素材の実体（メモのみ管理する）
+footage/
+素材/
+書き出し/
+export/
+
+# OS / エディタ
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
