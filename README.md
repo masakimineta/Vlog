@@ -26,7 +26,8 @@ Vlog の企画から公開までを 1 か所で管理するためのリポジト
 └── scripts/
     ├── new-episode.sh     # 新しいエピソードの雛形を作るスクリプト
     ├── auto-edit/         # 素材と台本から動画を自動編集するツール
-    └── route-map/         # 行程からルート図のアニメーションを作るツール
+    ├── route-map/         # 行程からルート図のアニメーションを作るツール
+    └── organize-footage/  # 撮影素材を行程どおりのフォルダへ振り分けるツール
 ```
 
 ## 使い方
@@ -79,6 +80,20 @@ BGM そのものは生成できないため、曲は自分で用意します。
 セットアップと詳しい使い方は [`scripts/auto-edit/README.md`](scripts/auto-edit/README.md) を参照してください。
 
 **手元の PC で実行する必要があります**（クラウド上のセッションには素材がないため）。
+
+## 撮影素材の振り分け
+
+撮影から帰ったら、まず素材を行程どおりのフォルダへ振り分けます。
+
+```bash
+cd scripts/organize-footage
+python -m organizefootage ~/Desktop/カメラから吸い出した素材 \
+  -o ~/Movies/Vlog素材/EP002-Fukuoka-JGC-Shugyo_Aug2026
+```
+
+撮影時刻から「何レグ目の素材か」を判定してフォルダに分け、素材一覧を作ります。
+編集ソフトにフォルダごと読み込めば、そのまま行程順に並びます。
+詳しくは [`scripts/organize-footage/README.md`](scripts/organize-footage/README.md) を参照してください。
 
 ## ルート図のアニメーション
 
