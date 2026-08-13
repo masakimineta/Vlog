@@ -48,6 +48,86 @@ def kind_of(path: Path) -> str | None:
     return None
 
 
+INDEX_NAME = "素材一覧.md"
+
+
+def apply_names(root: Path, dry_run: bool) -> int:
+    """素材一覧.md に書いたカット番号をもとに、命名規則のファイル名へ変更する。
+
+    振り分けだけでは元のファイル名（DJI_0001.MP4 など）のまま残る。
+    素材を見ながら一覧にカット番号と内容を書き込んだあと、これを実行する。
+
+        <撮影日>-<エピソードID>-<カット番号>-<内容>.<拡張子>
+        20260820-EP002-B002-便名表示.MP4
+    """
+    index = root / INDEX_NAME
+    if not index.exists():
+        print(f"素材一覧が見つかりません: {index}")
+        print("先に振り分けを実行してください。")
+        return 1
+
+    renamed = skipped = missing = 0
+    lines = index.read_text(encoding="utf-8").split("\n")
+    out_lines = []
+
+    for line in lines:
+        cells = [c.strip() for c in line.split("|")[1:-1]] if line.startswith("|") else []
+        # 日時 / 振り分け先 / ファイル / カット番号 / 内容
+        if len(cells) != 5 or cells[0] in ("日時", "---") or set(cells[0]) <= {"-"}:
+            out_lines.append(line)
+            continue
+
+        stamp, folder, filename, cut, desc = cells
+        filename = filename.strip("`")
+        if not cut:
+            skipped += 1
+            out_lines.append(line)
+            continue
+
+        src = root / folder / filename
+        if not src.exists():
+            print(f"  見つかりません: {src}")
+            missing += 1
+            out_lines.append(line)
+            continue
+
+        try:
+            shot_date = datetime.strptime(stamp.split()[0], "%Y-%m-%d")
+        except ValueError:
+            print(f"  日付が読めません: {stamp}")
+            out_lines.append(line)
+            continue
+
+        parts = [f"{shot_date:%Y%m%d}", EPISODE_ID, cut]
+        if desc:
+            parts.append(desc.replace(" ", "-").replace("/", "-"))
+        new_name = "-".join(parts) + src.suffix
+        dest = src.with_name(new_name)
+
+        if dest == src:
+            out_lines.append(line)
+            continue
+        if dest.exists():
+            print(f"  同名のファイルがあるので飛ばしました: {new_name}")
+            out_lines.append(line)
+            continue
+
+        print(f"  {filename}  →  {new_name}")
+        if not dry_run:
+            src.rename(dest)
+        renamed += 1
+        out_lines.append(f"| {stamp} | {folder} | `{new_name}` | {cut} | {desc} |")
+
+    if not dry_run and renamed:
+        index.write_text("\n".join(out_lines), encoding="utf-8")
+
+    print(f"\n変更: {renamed} 本  /  カット番号が空で見送り: {skipped} 本", end="")
+    print(f"  /  ファイルが見つからない: {missing} 本" if missing else "")
+    if skipped:
+        print(f"{INDEX_NAME} のカット番号欄を埋めてから、もう一度実行すると続きを変更できます。")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
         prog="python -m organizefootage",
@@ -66,7 +146,13 @@ def main(argv: list[str] | None = None) -> int:
                    help="実際には動かさず、振り分け結果だけ表示する")
     p.add_argument("--target", type=int, default=150,
                    help="目標素材本数。合格ラインの判定に使う（既定: 150）")
+    p.add_argument("--apply-names", action="store_true",
+                   help="素材一覧.md に書いたカット番号をもとに、docs/命名規則.md の"
+                        "ファイル名へ一括で変更する（振り分けは行わない）")
     args = p.parse_args(argv)
+
+    if args.apply_names:
+        return apply_names(args.output, args.dry_run)
 
     if not args.source.is_dir():
         print(f"素材フォルダが見つかりません: {args.source}")
@@ -126,7 +212,7 @@ def main(argv: list[str] | None = None) -> int:
     # --- 素材一覧を書く ---
     videos = sum(1 for f in files if kind_of(f) == "01_映像")
     if not args.dry_run:
-        index = args.output / "素材一覧.md"
+        index = args.output / INDEX_NAME
         index.parent.mkdir(parents=True, exist_ok=True)
         lines = [
             f"# 素材一覧: {EPISODE_ID}",
@@ -134,15 +220,27 @@ def main(argv: list[str] | None = None) -> int:
             f"- 生成日時: {datetime.now():%Y-%m-%d %H:%M}",
             f"- 映像 {videos} 本 / 全 {len(files)} ファイル",
             "",
-            "**カット番号は編集時に手で埋める。**"
-            " `撮影計画.md` のカットリストと突き合わせて、使ったものにチェックを入れる。",
+            "## 使い方",
             "",
-            "| 時刻 | 振り分け先 | ファイル | カット番号 |",
-            "|---|---|---|---|",
+            "1. 素材を見ながら、**カット番号**と**内容**の欄を埋める",
+            "   - カット番号は `撮影計画.md` のカットリストと同じもの（`A003` / `B012`）",
+            "   - `A` = 喋りのカット、`B` = それ以外。**フォルダの `L03` とは別の軸**"
+            "（`L03` は撮った位置、`A`/`B` はカットの種類）",
+            "2. 埋め終わったら次を実行すると、`docs/命名規則.md` のファイル名へ一括変更する",
+            "",
+            "```bash",
+            "python -m organizefootage . -o <このフォルダ> --apply-names",
+            "```",
+            "",
+            "空欄の行は変更されないので、途中まで埋めた状態で実行しても構わない。",
+            "",
+            "| 日時 | 振り分け先 | ファイル | カット番号 | 内容 |",
+            "|---|---|---|---|---|",
         ]
         rows = [(m, s, p_) for k in assigned for m, p_, s in assigned[k]]
         for moment, slot, src in sorted(rows):
-            lines.append(f"| {moment:%m/%d %H:%M} | {slot.folder} | `{src.name}` | |")
+            folder = f"{kind_of(src)}/{slot.folder}"
+            lines.append(f"| {moment:%Y-%m-%d %H:%M} | {folder} | `{src.name}` | | |")
         index.write_text("\n".join(lines) + "\n", encoding="utf-8")
         print(f"\n素材一覧を書きました: {index}")
 
