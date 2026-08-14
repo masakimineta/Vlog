@@ -207,9 +207,45 @@ Frame rate：30
 
 ---
 
-# 2. 素材を読み込み、Binを作る
+# 2. Media Poolを見やすく整理する
 
-MediaページまたはEditページのMedia Poolで、次のBinを作る。
+## 最初に知っておくこと
+
+Windowsで素材をフォルダ分けしていても、`Import Media`でファイルをまとめて選ぶと、**フォルダ構造は引き継がれず、素材だけが現在のBinへ入る**ことがある。
+
+Resolve内のフォルダは`Bin`と呼ぶ。  
+Media Pool内でクリップをBinへ移動しても、Windows上の元ファイルは移動・削除・改名されない。Resolveプロジェクト内の整理だけが変わる。
+
+---
+
+## 2-1. 既に素材だけを読み込んだ場合
+
+**タイムライン編集を始めている場合は、素材を削除・再読込しない。** 現在のクリップをBinへ振り分ける。タイムラインとのリンクは維持される。
+
+### まず表示をList Viewへ変える
+
+1. Editページ左上の`Media Pool`を開く
+2. Media Pool上部のList Viewアイコンをクリック
+3. `Clip Name`列の見出しをクリック
+4. 日付・ファイル名の昇順にする  
+   逆順になったら、もう一度`Clip Name`をクリック
+
+今回のファイル名は日付から始まるため、Clip Name順でほぼ撮影順になる。
+
+表示しておくと便利な列：
+
+- Clip Name
+- Date Created
+- Duration
+- Resolution
+- FPS
+- Audio Ch
+
+列が多すぎる場合は、列名の行を右クリックし、不要な列を非表示にする。
+
+### 親Binを作る
+
+Media Pool左側の`Master`を右クリック → `Add Bin`。次を作る。
 
 ```text
 00_OP候補
@@ -225,21 +261,218 @@ MediaページまたはEditページのMedia Poolで、次のBinを作る。
 10_BGM
 11_SE
 12_ルート図
-99_不採用候補
+90_Timeline
+99_未分類
 ```
 
-素材整理スクリプトで作ったL01〜L17フォルダは、対応するDayのBin内へ読み込む。
+タイムライン`EP002_MASTER_4K30`は`90_Timeline`へ移動する。映像素材とタイムラインが混ざらなくなる。
 
-1. Media Poolの空白を右クリック
-2. Import Media
-3. 日付・レグ別フォルダを選択
-4. 「Change Project Frame Rate?」が出ても、設定済みの30fpsを維持する
-5. 素材を数本開き、映像と音が正常か確認
+### Dayの中へレグ別Binを作る
+
+Day1〜Day3を右クリック → `Add Bin`で、必要なレグだけ子Binを作る。
+
+```text
+02_Day1
+  L01_HND-FUK
+  L02_FUK-KMI
+  L03_KMI-FUK
+  L04_FUK-KMI
+  L05_KMI-FUK
+  Day1_食事・ホテル
+
+03_Day2
+  L06〜L12
+  Day2_食事・ホテル
+
+04_Day3_国内線
+  L13〜L17
+  国際線へ移動
+```
+
+フォルダ名の先頭を`L01`、`L02`のように2桁へ統一すると、Resolve内でもレグ順に並ぶ。
+
+### クリップをまとめて移す
+
+1. `Master`または素材が平置きされたBinを開く
+2. Clip Name順にする
+3. 同じ日・同じレグの最初のクリップをクリック
+4. `Shift`を押しながら最後のクリップをクリック
+5. 選択された一群を、左側の該当Binへドラッグ
+6. 次のレグも同様に繰り返す
+
+離れた複数クリップだけを選ぶ場合は、`Ctrl`を押しながらクリックする。
+
+### 日付で絞り込んでから移す
+
+素材数が多い場合は、Media Poolの検索欄を使う。
+
+例：
+
+```text
+20260819
+20260820
+20260821
+20260822
+```
+
+1. 検索欄へ日付を入力
+2. その日の素材だけになったことを確認
+3. List ViewでClip Name順にする
+4. 必要な範囲をShift選択
+5. 対応するDayまたはレグBinへ移す
+6. 検索欄を消して次の日へ進む
+
+ファイル名に`L01`などのレグ番号が入っている場合は、日付ではなく`L01`で検索するとさらに早い。
+
+### 最初から完璧に分けなくてよい
+
+撮影直後は、まず次の5分類だけでもよい。
+
+```text
+Day0
+Day1
+Day2
+Day3
+写真・音源
+```
+
+粗編集で使う素材が分かってから、採用素材だけをレグ別Binへ細分化してもよい。200本すべてを細かく整理してから編集を始める必要はない。
+
+---
+
+## 2-2. 次回、Windowsのフォルダ構造をそのままBinにする方法
+
+通常の`Import Media`ではなく、**MediaページのMedia Storageからフォルダを読み込む**。
+
+1. 画面下部の`Media`ページを開く
+2. 左上の`Media Storage`で素材の親フォルダを探す
+3. Media Pool左側の`Master`または読み込み先Binを表示
+4. Media Storage側の親フォルダを右クリック
+5. 次の名称に近いコマンドを選ぶ
+
+```text
+Add Folder and SubFolders into Media Pool (Create Bins)
+```
+
+Resolveのバージョンによっては、次のように表示される。
+
+```text
+Add Folder and SubFolders into Media Pool (as Folders)
+```
+
+または、Media Storageの親フォルダをMedia Pool左側のFolder Viewへドラッグする。  
+この方法なら、Windows側の親フォルダ・子フォルダが、Resolve内でも親Bin・子Binとして作成される。
+
+### 注意
+
+- `Add Folder into Media Pool`：選んだフォルダ直下の素材だけ。子フォルダを無視することがある
+- `Add Folder and SubFolders into Media Pool`：子フォルダの素材も入るが、表示される選択肢によっては1つのBinへ平置き
+- `Create Bins`または`as Folders`付き：フォルダ階層をBinとして維持
+
+**今回のようにフォルダ構造を残したい場合は、`Create Bins`／`as Folders`付きの方を選ぶ。**
+
+すでに同じ素材を読み込んで編集を始めている場合は、この方法で再読込するとMedia Pool内で重複する可能性がある。現在のEP002では再読込せず、2-1の方法で整理する。
+
+---
+
+## 2-3. Icon ViewとList Viewの使い分け
+
+### List View
+
+次の作業向け：
+
+- 日付・ファイル名順に並べる
+- 解像度やfpsを確認する
+- 大量の素材をまとめて選ぶ
+- レグ別Binへ振り分ける
+
+### Icon View
+
+次の作業向け：
+
+- 映像内容をサムネイルで探す
+- 良い表情・機窓・食事を目で選ぶ
+- 冒頭候補を比較する
+
+整理するときはList View、映像を選ぶときはIcon Viewに切り替える。
+
+Icon ViewではSortメニューを`Clip Name`にすると、日付ファイル名順を維持できる。`Custom`にするとサムネイルを好きな順番へ手動配置できるが、今回の基本は`Clip Name`順を使う。
+
+---
+
+## 2-4. 採用候補を色とFlagで区別する
+
+Bin分けとは別に、素材の状態を印で管理する。
+
+おすすめ：
+
+```text
+青：Aロール
+緑：Bロール採用候補
+黄：冒頭候補
+赤：個人情報・他人の顔の確認が必要
+Flagなし：未確認
+```
+
+操作：
+
+1. クリップを右クリック
+2. `Clip Color`または`Flag`
+3. 決めた色を選ぶ
+
+色の意味を途中で変えない。  
+削除候補でも、撮影直後はMedia Poolから消さず、`99_未分類`または専用の不採用候補Binへ移す。
+
+---
+
+## 2-5. 今回おすすめのMedia Pool完成形
+
+```text
+Master
+  00_OP候補
+  01_Day0_Sydney-日本
+  02_Day1
+    L01_HND-FUK
+    L02_FUK-KMI
+    L03_KMI-FUK
+    L04_FUK-KMI
+    L05_KMI-FUK
+    Day1_食事・ホテル
+  03_Day2
+    L06〜L12
+    Day2_食事・ホテル
+  04_Day3_国内線
+    L13〜L17
+    国際線へ移動
+  05_SakuraLounge
+  06_JL51_Business
+  07_Sydney帰着
+  08_帰宅後_数字とまとめ
+  09_写真
+  10_BGM
+  11_SE
+  12_ルート図
+  90_Timeline
+  99_未分類
+```
+
+最初に`Day → レグ`だけ分ける。Aロール／BロールまでBinで二重に細分化せず、Aロール・BロールはClip Colorで区別する方が探しやすい。
+
+## 整理完了チェック
+
+- [ ] 素材がClip Name昇順
+- [ ] Day0〜Day3のBinがある
+- [ ] Day1〜Day3にレグ別の子Binがある
+- [ ] Sakura LoungeとJL51が別Bin
+- [ ] 写真、BGM、SEが映像素材と分かれている
+- [ ] タイムラインが`90_Timeline`にある
+- [ ] 未分類素材の置き場がある
+- [ ] 同じ素材を重複して読み込んでいない
 
 ## PCが重い場合
 
-素材をMedia Poolで選択 → 右クリック → Generate Proxy Media。  
-作成後、Playback → Proxy Handling → Prefer Proxiesを選ぶ。最終書き出しは通常、元素材を参照する。
+素材をMedia Poolで選択 → 右クリック → `Generate Proxy Media`。  
+作成後、`Playback → Proxy Handling → Prefer Proxies`を選ぶ。最終書き出しは通常、元素材を参照する。
 
 ---
 
