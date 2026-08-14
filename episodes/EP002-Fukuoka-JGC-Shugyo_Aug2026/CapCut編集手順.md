@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **編集ソフトをDaVinci Resolveへ変更しました。**
+> EP002の現在の実作業手順は [DaVinci Resolve編集手順.md](./DaVinci%20Resolve編集手順.md) を使用してください。
+> このファイルは、これまで作成したCapCut版の検討内容を失わないための旧版資料として残しています。内容設計の最新版は [編集メモ.md](./編集メモ.md) です。
+
 # CapCut実作業手順: EP002 福岡JGC修行
 
 > CapCut PCを開き、このファイルを上から順に実行する。
