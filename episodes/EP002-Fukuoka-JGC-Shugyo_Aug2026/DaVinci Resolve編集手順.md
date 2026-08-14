@@ -28,32 +28,182 @@
 
 ---
 
-# 1. プロジェクトを作る
+# 0. 最初に決める「完成動画の設定」
 
-1. Resolveを起動
-2. Project Managerで「New Project」
-3. 名前を `EP002_JGC-Shugyo`
-4. 右下の歯車「Project Settings」を開く
-5. Master Settingsで次を設定
+Resolveを開く前に、今回作る動画の仕様を固定する。EP001のNZ再編集では縦1080×1920・60fpsだったが、**EP002は横3840×2160・30fps**。設定を流用しない。
+
+| 項目 | EP002で使う設定 | 意味 |
+|---|---|---|
+| 画面方向 | 横16:9 | YouTubeの通常動画 |
+| Timeline resolution | `3840 × 2160 Ultra HD` | 4K UHD |
+| Timeline frame rate | `30 fps` | 編集タイムラインのfps |
+| Playback frame rate | `30 fps` | 編集中の再生fps |
+| Pixel aspect ratio | `Square` | 通常のスマホ・Pocket 3映像 |
+| 音声 | `48 kHz / Stereo` | YouTube動画の基本設定 |
+| 公開用形式 | `MP4 / H.264` | YouTube用の完成ファイル |
+| 公開用ビットレート | 約`50,000 Kb/s` | 4K公開版の目安 |
+
+## なぜ30fpsにするか
+
+今回の基本撮影設定が4K/30fpsだから。60fps素材が一部あっても、タイムラインは30fpsのままにする。60fps素材は通常速度でも使えるが、必要なカットだけスロー用として使用する。
+
+**最重要：Timeline frame rateは素材を並べる前に30fpsへ設定する。**  
+一度タイムラインへ素材を入れると、後から変更できない場合がある。
+
+---
+
+# 1. 新規プロジェクトを作り、最初の設定を完了する
+
+## 1-1. 新規プロジェクト
+
+1. DaVinci Resolveを起動
+2. 最初の「Project Manager」で `New Project`
+3. Project Nameへ `EP002_JGC-Shugyo`
+4. `Create`
+5. プロジェクトが開いたら、まだ素材を読み込まない
+
+## 1-2. Project Settingsを開く
+
+画面右下の歯車アイコンをクリックする。  
+ウィンドウ上部または左側で `Master Settings` を選ぶ。
+
+## 1-3. Timeline Format
+
+`Master Settings → Timeline Format`で、次のとおり設定する。
 
 ```text
 Timeline resolution：3840 × 2160 Ultra HD
 Timeline frame rate：30
 Playback frame rate：30
+Pixel aspect ratio：Square
 ```
 
-6. Save
+確認する数字：
 
-**フレームレートは素材を並べる前に決める。** 今回は横16:9、4K、30fpsで統一する。スマホもPocket 3も横向き素材を使用する。
+- Widthが`3840`
+- Heightが`2160`
+- `2160 × 3840`にしない
+- `1920 × 1080`にしない
+- Timeline frame rateとPlayback frame rateが両方`30`
 
-## 保存とバックアップ
+`Video Monitoring`は最初は初期値のままでよい。これは完成動画の解像度を決める欄ではない。
 
-Project Settings → Project Save and Loadで、利用できる場合は以下を有効にする。
+## 1-4. Image Scaling
 
-- Live Save
-- Project Backups
+`Project Settings → Image Scaling`を開く。
 
-編集終了時には `Ctrl+S` も押す。
+基本的には初期値のままでよい。スマホとPocket 3を横16:9で撮影していれば、通常は自動的に画面へ合う。
+
+縦素材や比率の違う素材が混ざった場合は、プロジェクト全体の設定を変えず、後でそのクリップだけInspectorの`Zoom`と`Position`で調整する。
+
+## 1-5. Color Management
+
+`Project Settings → Color Management`を開く。
+
+今回の最初の作品では複雑なカラーマネジメントを組まず、次を基本にする。
+
+```text
+Color science：DaVinci YRGB
+Timeline color space：Rec.709 Gamma 2.4
+Output color space：Rec.709 Gamma 2.4
+```
+
+Pocket 3をD-Log Mで撮影した素材がある場合も、この画面で適当に設定を変えない。素材確認後、Colorページで別途変換・補正する。通常色で撮影したスマホ素材やPocket 3素材へ、Log用変換をかけない。
+
+※現在のResolveでTimeline／Output color space欄が表示されない、または初期値がRec.709になっている場合は、そのままでよい。
+
+## 1-6. 音声設定
+
+`Project Settings → Fairlight`または音声設定欄で確認する。
+
+```text
+Timeline sample rate：48 kHz
+Bus format：Stereo
+```
+
+表示場所がバージョンにより異なる場合は、48 kHzの初期値を維持する。LRC、5.1、7.1には変更しない。
+
+## 1-7. 作業ファイルとプロキシの保存先
+
+`Master Settings → Working Folders`で、Cache filesとProxy generation locationを確認する。
+
+推奨フォルダ例：
+
+```text
+EP002編集
+  01_素材
+  02_音源
+  03_Resolve_Proxy
+  04_Resolve_Cache
+  05_書き出し
+```
+
+- Proxy generation location：`03_Resolve_Proxy`
+- Cache files location：`04_Resolve_Cache`
+
+保存先を変更しなくても編集できるが、素材と同じドライブに十分な空き容量があるか確認する。OneDrive同期中に重くなる場合は、Proxy／CacheだけPC内の同期対象外フォルダへ置いてよい。
+
+## 1-8. 自動保存とバックアップ
+
+`Project Settings → Project Save and Load`で、利用できる場合は次を有効にする。
+
+- `Live Save`
+- `Project Backups`
+
+バックアップ間隔は初期値でもよい。設定後も、編集終了時には`Ctrl+S`を押す。
+
+## 1-9. 設定を保存する
+
+1. 右下の`Save`
+2. もう一度右下の歯車を開く
+3. 次の4項目だけ再確認
+
+```text
+3840 × 2160
+30 fps
+30 fps
+Square
+```
+
+ここまで終わってから素材を読み込む。
+
+## 1-10. 最初の素材読み込み時に質問が出たら
+
+30fps以外の素材を最初に読み込むと、次のような確認が出る場合がある。
+
+```text
+Change Project Frame Rate?
+```
+
+今回の設定を30fpsで維持するため、**ChangeではなくDon't Changeを選ぶ。**
+
+## 1-11. タイムラインを作る
+
+1. `File → New Timeline`
+2. Timeline Name：`EP002_MASTER_4K30`
+3. `Use Project Settings`をオン
+4. `Create`
+5. Media Poolのタイムラインを右クリック → `Timeline Settings`
+6. 次を確認
+
+```text
+Use Project Settings：オン
+Resolution：3840 × 2160
+Frame rate：30
+```
+
+## 設定完了チェック
+
+- [ ] 横16:9
+- [ ] 3840×2160
+- [ ] Timeline 30fps
+- [ ] Playback 30fps
+- [ ] Pixel aspect ratioはSquare
+- [ ] 音声48 kHz／Stereo
+- [ ] Live Save／Project Backupsを確認
+- [ ] Proxy／Cacheの保存先を確認
+- [ ] タイムライン名は`EP002_MASTER_4K30`
+- [ ] 素材読込時のフレームレート変更を拒否
 
 ---
 
