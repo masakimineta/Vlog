@@ -145,7 +145,7 @@ EP002編集
 
 ## 1-8. 自動保存とバックアップ
 
-`Project Settings → Project Save and Load`で、利用できる場合は次を有効にする。
+上部メニューの`DaVinci Resolve → Preferences → User → Project Save and Load`を開き、利用できる場合は次を有効にする。Windows環境でもメニュー名は`DaVinci Resolve`。
 
 - `Live Save`
 - `Project Backups`
@@ -243,11 +243,9 @@ MediaページまたはEditページのMedia Poolで、次のBinを作る。
 
 ---
 
-# 3. タイムラインとトラックを作る
+# 3. タイムラインのトラックを準備する
 
-1. File → New Timeline
-2. 名前を `EP002_MASTER_4K30`
-3. Use Project Settingsを使用
+セクション1-11で作った`EP002_MASTER_4K30`を開く。新しいタイムラインをもう一度作る必要はない。
 
 トラックは次の役割に固定する。
 
@@ -579,7 +577,7 @@ Effects → Titles → Text+をV4へ置き、Inspectorで文字・位置・大�
 
 ---
 
-# 13. 韴声・BGM・効果音
+# 13. 音声・BGM・効果音
 
 ## BGMを入れる
 
